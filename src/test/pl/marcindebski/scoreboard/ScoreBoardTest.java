@@ -2,7 +2,6 @@ package pl.marcindebski.scoreboard;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
@@ -33,6 +32,9 @@ public class ScoreBoardTest {
     @BeforeEach
     void initMocks() {
         mocks = MockitoAnnotations.openMocks(this);
+        MockingDetails timeProviderInfo = Mockito.mockingDetails(timeProvider);
+        Mockito.when(timeProvider.getTime()).thenAnswer(invocation -> Instant.now().plusNanos(timeProviderInfo.getInvocations().size()));
+
     }
 
     @AfterEach
@@ -42,7 +44,7 @@ public class ScoreBoardTest {
 
     @Test
     public void testCreateMatch() {
-        Match match = scoreBoard.createMatch(MEXICO, CANADA);
+        Match match = scoreBoard.startGame(MEXICO, CANADA);
         assertThat(match.getHomeScore()).isZero();
         assertThat(match.getAwayScore()).isZero();
     }
@@ -50,30 +52,21 @@ public class ScoreBoardTest {
     @Test
     public void testNullTeamShouldThrowException() {
         assertThatExceptionOfType(NullPointerException.class).isThrownBy(() ->
-                scoreBoard.createMatch(null, CANADA)).withMessage("home team cannot be null");
+                scoreBoard.startGame(null, CANADA)).withMessage("home team cannot be null");
 
         assertThatExceptionOfType(NullPointerException.class).isThrownBy(() ->
-                scoreBoard.createMatch(CANADA, null)).withMessage("away team cannot be null");
+                scoreBoard.startGame(CANADA, null)).withMessage("away team cannot be null");
     }
 
     @Test
     public void testSameTeamNamesShouldThrowException() {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                scoreBoard.createMatch(CANADA, CANADA)).withMessage("team names cannot be equal");
-    }
-
-    @Test
-    public void testGetSummary() {
-        scoreBoard.createMatch(MEXICO, CANADA);
-        Iterable<Match> matches = scoreBoard.getSummary();
-        assertThat(matches)
-                .usingElementComparatorIgnoringFields("id", "startTime")
-                .containsOnly(match(MEXICO, CANADA, 0, 0));
+                scoreBoard.startGame(CANADA, CANADA)).withMessage("team names cannot be equal");
     }
 
     @Test
     public void testFinishGame() {
-        Match match = scoreBoard.createMatch(MEXICO, CANADA);
+        Match match = scoreBoard.startGame(MEXICO, CANADA);
         scoreBoard.finishGame(match.getId());
         Iterable<Match> summary = scoreBoard.getSummary();
         assertThat(summary).isEmpty();
@@ -81,7 +74,7 @@ public class ScoreBoardTest {
 
     @Test
     public void testFinishGameWithWrongIdShouldPass() {
-        scoreBoard.createMatch(MEXICO, CANADA);
+        scoreBoard.startGame(MEXICO, CANADA);
         scoreBoard.finishGame(Match.MatchId.random());
         Iterable<Match> summary = scoreBoard.getSummary();
         assertThat(summary).hasSize(1);
@@ -89,7 +82,7 @@ public class ScoreBoardTest {
 
     @Test
     public void testUpdateScore() {
-        Match match = scoreBoard.createMatch(MEXICO, CANADA);
+        Match match = scoreBoard.startGame(MEXICO, CANADA);
 
         Iterable<Match> summary = scoreBoard.getSummary();
         assertThat(summary)
@@ -104,25 +97,13 @@ public class ScoreBoardTest {
                 .containsOnly(match(MEXICO, CANADA, 4, 3));
     }
 
-    @RepeatedTest(10)
-    public void testMatchOrder() {
-        MockingDetails timeProviderInfo = Mockito.mockingDetails(timeProvider);
-        Mockito.when(timeProvider.getTime()).thenAnswer(invocation -> Instant.now().plusNanos(timeProviderInfo.getInvocations().size()));
-
-        Match mexCan = scoreBoard.createMatch(MEXICO, CANADA);
-        Match spaBra = scoreBoard.createMatch(SPAIN, BRAZIL);
-        Match gerFra = scoreBoard.createMatch(GERMANY, FRANCE);
-        Match uruIta = scoreBoard.createMatch(URUGUAY, ITALY);
-        Match argAus = scoreBoard.createMatch(ARGENTINA, AUSTRALIA);
-        assertThat(scoreBoard.getSummary())
-                .usingElementComparatorIgnoringFields("id", "startTime")
-                .containsExactly(
-                        match(ARGENTINA, AUSTRALIA, 0, 0),
-                        match(URUGUAY, ITALY, 0, 0),
-                        match(GERMANY, FRANCE, 0, 0),
-                        match(SPAIN, BRAZIL, 0, 0),
-                        match(MEXICO, CANADA, 0, 0)
-                );
+    @Test
+    public void testGetSummary() {
+        Match mexCan = scoreBoard.startGame(MEXICO, CANADA);
+        Match spaBra = scoreBoard.startGame(SPAIN, BRAZIL);
+        Match gerFra = scoreBoard.startGame(GERMANY, FRANCE);
+        Match uruIta = scoreBoard.startGame(URUGUAY, ITALY);
+        Match argAus = scoreBoard.startGame(ARGENTINA, AUSTRALIA);
 
         scoreBoard.updateScore(mexCan.getId(), 0, 5);
         scoreBoard.updateScore(spaBra.getId(), 10, 2);
@@ -142,6 +123,6 @@ public class ScoreBoardTest {
     }
 
     private Match match(String homeTeam, String awayTeam, int homeScore, int awayScore) {
-        return new Match(Instant::now, homeTeam, awayTeam).withScore(homeScore, awayScore);
+        return new Match(timeProvider.getTime(), homeTeam, awayTeam).withScore(homeScore, awayScore);
     }
 }

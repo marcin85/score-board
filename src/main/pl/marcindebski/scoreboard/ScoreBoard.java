@@ -1,6 +1,7 @@
 package pl.marcindebski.scoreboard;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -16,15 +17,15 @@ public class ScoreBoard {
         this.matches = new ArrayList<>();
     }
 
-    public Match createMatch(String homeTeam, String awayTeam) {
+    public Match startGame(String homeTeam, String awayTeam) {
         validate(homeTeam, awayTeam);
 
-        Match match = new Match(timeProvider, homeTeam, awayTeam);
+        Match match = new Match(timeProvider.getTime(), homeTeam, awayTeam);
         matches = Stream.concat(Stream.of(match), matches.stream()).sorted().toList();
         return match;
     }
 
-    private static void validate(String homeTeam, String awayTeam) {
+    private void validate(String homeTeam, String awayTeam) {
         requireNonNull(homeTeam, "home team cannot be null");
         requireNonNull(awayTeam, "away team cannot be null");
 
@@ -33,8 +34,8 @@ public class ScoreBoard {
         }
     }
 
-    public Iterable<Match> getSummary() {
-        return matches;
+    public List<Match> getSummary() {
+        return Collections.unmodifiableList(matches);
     }
 
     public void finishGame(Match.MatchId id) {

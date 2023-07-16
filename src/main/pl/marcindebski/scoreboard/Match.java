@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.UUID;
 
 @Value
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Match implements Comparable<Match> {
     static Comparator<Match> MATCH_COMPARATOR = Comparator.comparingInt(Match::getTotalScore).thenComparing(Match::getStartTime).reversed();
 
@@ -21,17 +22,8 @@ public class Match implements Comparable<Match> {
     int homeScore;
     int awayScore;
 
-    Match(TimeProvider startTime, String homeTeam, String awayTeam) {
-        this(MatchId.random(), startTime.getTime(), homeTeam, awayTeam, 0, 0);
-    }
-
-    private Match(MatchId id, Instant startTime, String homeTeam, String awayTeam, int homeScore, int awayScore) {
-        this.id = id;
-        this.startTime = startTime;
-        this.homeTeam = homeTeam;
-        this.awayTeam = awayTeam;
-        this.homeScore = homeScore;
-        this.awayScore = awayScore;
+    Match(Instant startTime, String homeTeam, String awayTeam) {
+        this(MatchId.random(), startTime, homeTeam, awayTeam, 0, 0);
     }
 
     @Override
