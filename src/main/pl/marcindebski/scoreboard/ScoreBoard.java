@@ -1,11 +1,13 @@
 package pl.marcindebski.scoreboard;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
 public class ScoreBoard {
-    private final List<Match> matches;
+    private List<Match> matches;
 
     public ScoreBoard() {
         this.matches = new ArrayList<>();
@@ -14,7 +16,7 @@ public class ScoreBoard {
     public Match createMatch(String homeTeam, String awayTeam) {
         validate(homeTeam, awayTeam);
 
-        Match match = new Match(homeTeam, awayTeam);
+        Match match = new Match(Match.MatchId.random(), homeTeam, awayTeam);
         matches.add(match);
         return match;
     }
@@ -30,6 +32,10 @@ public class ScoreBoard {
 
     public Iterable<Match> getSummary() {
         return matches;
+    }
+
+    public void finishGame(Match.MatchId id) {
+        matches = matches.stream().filter(match -> !Objects.equals(id, match.getId())).sorted().toList();
     }
 
 }

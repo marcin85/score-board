@@ -49,4 +49,12 @@ public class ScoreBoardTest {
             assertThat(match.getAwayTeam()).isEqualTo(CANADA);
         });
     }
+
+    @Test
+    public void testFinishGame() {
+        Match match = scoreBoard.createMatch(MEXICO, CANADA);
+        scoreBoard.finishGame(match.getId());
+        Iterable<Match> summary = scoreBoard.getSummary();
+        assertThat(summary).isEmpty();
+    }
 }
