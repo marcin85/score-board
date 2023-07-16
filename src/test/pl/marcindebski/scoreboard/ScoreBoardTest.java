@@ -33,4 +33,10 @@ public class ScoreBoardTest {
         assertThatExceptionOfType(NullPointerException.class).isThrownBy(() ->
                 scoreBoard.createMatch(CANADA, null)).withMessage("away team cannot be null");
     }
+
+    @Test
+    public void testSameTeamNamesShouldThrowException() {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+                scoreBoard.createMatch(CANADA, CANADA)).withMessage("team names cannot be equal");
+    }
 }
