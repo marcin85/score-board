@@ -16,4 +16,12 @@ public class Match {
     public int getAwayScore() {
         return 0;
     }
+
+    public String getHomeTeam() {
+        return homeTeam;
+    }
+
+    public String getAwayTeam() {
+        return awayTeam;
+    }
 }

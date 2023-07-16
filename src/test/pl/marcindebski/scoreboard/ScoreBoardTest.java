@@ -39,4 +39,14 @@ public class ScoreBoardTest {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
                 scoreBoard.createMatch(CANADA, CANADA)).withMessage("team names cannot be equal");
     }
+
+    @Test
+    public void testGetSummary() {
+        scoreBoard.createMatch(MEXICO, CANADA);
+        Iterable<Match> matches = scoreBoard.getSummary();
+        assertThat(matches).hasSize(1).hasOnlyOneElementSatisfying(match -> {
+            assertThat(match.getHomeTeam()).isEqualTo(MEXICO);
+            assertThat(match.getAwayTeam()).isEqualTo(CANADA);
+        });
+    }
 }

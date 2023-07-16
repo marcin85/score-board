@@ -1,14 +1,22 @@
 package pl.marcindebski.scoreboard;
 
-import java.util.Objects;
+import java.util.*;
 
 import static java.util.Objects.requireNonNull;
 
 public class ScoreBoard {
+    private final List<Match> matches;
+
+    public ScoreBoard() {
+        this.matches = new ArrayList<>();
+    }
+
     public Match createMatch(String homeTeam, String awayTeam) {
         validate(homeTeam, awayTeam);
 
-        return new Match(homeTeam, awayTeam);
+        Match match = new Match(homeTeam, awayTeam);
+        matches.add(match);
+        return match;
     }
 
     private static void validate(String homeTeam, String awayTeam) {
@@ -18,6 +26,10 @@ public class ScoreBoard {
         if (Objects.equals(homeTeam, awayTeam)) {
             throw new IllegalArgumentException("team names cannot be equal");
         }
+    }
+
+    public Iterable<Match> getSummary() {
+        return matches;
     }
 
 }
