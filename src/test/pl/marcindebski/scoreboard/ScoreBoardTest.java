@@ -44,10 +44,9 @@ public class ScoreBoardTest {
     public void testGetSummary() {
         scoreBoard.createMatch(MEXICO, CANADA);
         Iterable<Match> matches = scoreBoard.getSummary();
-        assertThat(matches).hasSize(1).hasOnlyOneElementSatisfying(match -> {
-            assertThat(match.getHomeTeam()).isEqualTo(MEXICO);
-            assertThat(match.getAwayTeam()).isEqualTo(CANADA);
-        });
+        assertThat(matches)
+                .usingElementComparatorIgnoringFields("id")
+                .containsOnly(match(MEXICO, CANADA, 0, 0));
     }
 
     @Test
@@ -64,5 +63,26 @@ public class ScoreBoardTest {
         scoreBoard.finishGame(Match.MatchId.random());
         Iterable<Match> summary = scoreBoard.getSummary();
         assertThat(summary).hasSize(1);
+    }
+
+    @Test
+    public void testUpdateScore() {
+        Match match = scoreBoard.createMatch(MEXICO, CANADA);
+
+        Iterable<Match> summary = scoreBoard.getSummary();
+        assertThat(summary)
+                .usingElementComparatorIgnoringFields("id")
+                .containsOnly(match(MEXICO, CANADA, 0, 0));
+
+        scoreBoard.updateScore(match.getId(), 4, 3);
+
+        Iterable<Match> summaryAfterUpdate = scoreBoard.getSummary();
+        assertThat(summaryAfterUpdate)
+                .usingElementComparatorIgnoringFields("id")
+                .containsOnly(match(MEXICO, CANADA, 4, 3));
+    }
+
+    private Match match(String homeTeam, String awayTeam, int homeScore, int awayScore) {
+        return new Match(homeTeam, awayTeam).withScore(homeScore, awayScore);
     }
 }

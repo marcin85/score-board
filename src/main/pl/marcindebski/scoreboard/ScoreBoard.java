@@ -16,7 +16,7 @@ public class ScoreBoard {
     public Match createMatch(String homeTeam, String awayTeam) {
         validate(homeTeam, awayTeam);
 
-        Match match = new Match(Match.MatchId.random(), homeTeam, awayTeam);
+        Match match = new Match(homeTeam, awayTeam);
         matches.add(match);
         return match;
     }
@@ -36,6 +36,16 @@ public class ScoreBoard {
 
     public void finishGame(Match.MatchId id) {
         matches = matches.stream().filter(match -> !Objects.equals(id, match.getId())).sorted().toList();
+    }
+
+    public void updateScore(Match.MatchId id, int homeScore, int awayScore) {
+        matches = matches.stream().map(match -> {
+            if (match.getId().equals(id)) {
+                return match.withScore(homeScore, awayScore);
+            } else {
+                return match;
+            }
+        }).toList();
     }
 
 }

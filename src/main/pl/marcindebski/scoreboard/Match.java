@@ -8,27 +8,32 @@ import java.util.UUID;
 
 @Value
 public class Match {
+    MatchId id;
+
     String homeTeam;
     String awayTeam;
 
-    MatchId id;
+    int homeScore;
+    int awayScore;
 
-    public Match(MatchId id, String homeTeam, String awayTeam) {
+    Match(String homeTeam, String awayTeam) {
+        this(MatchId.random(), homeTeam, awayTeam, 0, 0);
+    }
+
+    private Match(MatchId id, String homeTeam, String awayTeam, int homeScore, int awayScore) {
         this.id = id;
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
-    }
-
-    public int getHomeScore() {
-        return 0;
-    }
-
-    public int getAwayScore() {
-        return 0;
+        this.homeScore = homeScore;
+        this.awayScore = awayScore;
     }
 
     public MatchId getId() {
         return id;
+    }
+
+    public Match withScore(int homeScore, int awayScore) {
+        return new Match(id, homeTeam, awayTeam, homeScore, awayScore);
     }
 
     @Value
