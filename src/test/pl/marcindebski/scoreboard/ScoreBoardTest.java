@@ -57,4 +57,12 @@ public class ScoreBoardTest {
         Iterable<Match> summary = scoreBoard.getSummary();
         assertThat(summary).isEmpty();
     }
+
+    @Test
+    public void testFinishGameWithWrongIdShouldPass() {
+        scoreBoard.createMatch(MEXICO, CANADA);
+        scoreBoard.finishGame(Match.MatchId.random());
+        Iterable<Match> summary = scoreBoard.getSummary();
+        assertThat(summary).hasSize(1);
+    }
 }
