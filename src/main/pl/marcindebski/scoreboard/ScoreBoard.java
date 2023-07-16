@@ -3,21 +3,24 @@ package pl.marcindebski.scoreboard;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
 public class ScoreBoard {
     private List<Match> matches;
+    private final TimeProvider timeProvider;
 
-    public ScoreBoard() {
+    public ScoreBoard(TimeProvider timeProvider) {
+        this.timeProvider = timeProvider;
         this.matches = new ArrayList<>();
     }
 
     public Match createMatch(String homeTeam, String awayTeam) {
         validate(homeTeam, awayTeam);
 
-        Match match = new Match(homeTeam, awayTeam);
-        matches.add(match);
+        Match match = new Match(timeProvider, homeTeam, awayTeam);
+        matches = Stream.concat(Stream.of(match), matches.stream()).sorted().toList();
         return match;
     }
 
@@ -45,7 +48,7 @@ public class ScoreBoard {
             } else {
                 return match;
             }
-        }).toList();
+        }).sorted().toList();
     }
 
 }
