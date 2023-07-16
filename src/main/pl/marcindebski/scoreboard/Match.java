@@ -28,10 +28,6 @@ public class Match {
         this.awayScore = awayScore;
     }
 
-    public MatchId getId() {
-        return id;
-    }
-
     public Match withScore(int homeScore, int awayScore) {
         return new Match(id, homeTeam, awayTeam, homeScore, awayScore);
     }
