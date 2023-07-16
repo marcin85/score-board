@@ -1,12 +1,17 @@
 package pl.marcindebski.scoreboard;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Value;
+
 import java.util.UUID;
 
+@Value
 public class Match {
-    private final String homeTeam;
-    private final String awayTeam;
+    String homeTeam;
+    String awayTeam;
 
-    private final MatchId id;
+    MatchId id;
 
     public Match(MatchId id, String homeTeam, String awayTeam) {
         this.id = id;
@@ -22,24 +27,14 @@ public class Match {
         return 0;
     }
 
-    public String getHomeTeam() {
-        return homeTeam;
-    }
-
-    public String getAwayTeam() {
-        return awayTeam;
-    }
-
     public MatchId getId() {
         return id;
     }
 
+    @Value
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class MatchId {
         UUID uuid;
-
-        public MatchId(UUID uuid) {
-            this.uuid = uuid;
-        }
 
         public static MatchId random() {
             return new MatchId(UUID.randomUUID());
