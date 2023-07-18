@@ -24,7 +24,7 @@ public class ScoreBoardTest {
     public static final String AUSTRALIA = "Australia";
 
     @Mock
-    private TimeProvider timeProvider;
+    private TimeSupplier timeSupplier;
     @InjectMocks
     private ScoreBoard scoreBoard;
     private AutoCloseable mocks;
@@ -32,8 +32,8 @@ public class ScoreBoardTest {
     @BeforeEach
     void initMocks() {
         mocks = MockitoAnnotations.openMocks(this);
-        MockingDetails timeProviderInfo = Mockito.mockingDetails(timeProvider);
-        Mockito.when(timeProvider.getTime()).thenAnswer(invocation -> Instant.now().plusNanos(timeProviderInfo.getInvocations().size()));
+        MockingDetails timeProviderInfo = Mockito.mockingDetails(timeSupplier);
+        Mockito.when(timeSupplier.get()).thenAnswer(invocation -> Instant.now().plusNanos(timeProviderInfo.getInvocations().size()));
 
     }
 
@@ -123,6 +123,6 @@ public class ScoreBoardTest {
     }
 
     private Match match(String homeTeam, String awayTeam, int homeScore, int awayScore) {
-        return new Match(timeProvider.getTime(), homeTeam, awayTeam).withScore(homeScore, awayScore);
+        return new Match(timeSupplier.get(), homeTeam, awayTeam).withScore(homeScore, awayScore);
     }
 }

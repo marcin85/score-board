@@ -10,17 +10,17 @@ import static java.util.Objects.requireNonNull;
 
 public class ScoreBoard {
     private List<Match> matches;
-    private final TimeProvider timeProvider;
+    private final TimeSupplier timeSupplier;
 
-    public ScoreBoard(TimeProvider timeProvider) {
-        this.timeProvider = timeProvider;
+    public ScoreBoard(TimeSupplier timeSupplier) {
+        this.timeSupplier = timeSupplier;
         this.matches = new ArrayList<>();
     }
 
     public Match startGame(String homeTeam, String awayTeam) {
         validate(homeTeam, awayTeam);
 
-        Match match = new Match(timeProvider.getTime(), homeTeam, awayTeam);
+        Match match = new Match(timeSupplier.get(), homeTeam, awayTeam);
         matches = Stream.concat(Stream.of(match), matches.stream()).sorted().toList();
         return match;
     }
