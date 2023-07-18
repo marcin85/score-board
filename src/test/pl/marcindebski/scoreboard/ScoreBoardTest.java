@@ -1,11 +1,10 @@
 package pl.marcindebski.scoreboard;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
 
 import java.time.Instant;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
@@ -23,24 +22,18 @@ public class ScoreBoardTest {
     public static final String ARGENTINA = "Argentina";
     public static final String AUSTRALIA = "Australia";
 
-    @Mock
+
     private TimeSupplier timeSupplier;
-    @InjectMocks
+
     private ScoreBoard scoreBoard;
-    private AutoCloseable mocks;
+
 
     @BeforeEach
-    void initMocks() {
-        mocks = MockitoAnnotations.openMocks(this);
-        MockingDetails timeProviderInfo = Mockito.mockingDetails(timeSupplier);
-        Mockito.when(timeSupplier.get()).thenAnswer(invocation -> Instant.now().plusNanos(timeProviderInfo.getInvocations().size()));
-
+    void setUp() {
+        timeSupplier = new TimeSupplierMock();
+        scoreBoard = new ScoreBoard(timeSupplier);
     }
 
-    @AfterEach
-    void closeMocks() throws Exception {
-        mocks.close();
-    }
 
     @Test
     public void testCreateMatch() {
@@ -125,4 +118,14 @@ public class ScoreBoardTest {
     private Match match(String homeTeam, String awayTeam, int homeScore, int awayScore) {
         return new Match(timeSupplier.get(), homeTeam, awayTeam).withScore(homeScore, awayScore);
     }
+
+    private static class TimeSupplierMock extends TimeSupplier {
+        private final AtomicLong time = new AtomicLong();
+
+        @Override
+        public Instant get() {
+            return Instant.now().plusNanos(time.incrementAndGet());
+        }
+    }
+
 }
